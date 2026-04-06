@@ -3,6 +3,7 @@ using backend_marsh_project.Entities;
 using backend_marsh_project.Services;
 using backend_marsh_project.Exceptions;
 using backend_marsh_project.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend_marsh_project.Controllers
 {
@@ -17,6 +18,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Device>>> GetDevices()
         {
             var devices = await _deviceService.GetAllDevices();
@@ -25,6 +27,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<Device>> GetDevice(int id)
         {
             try
@@ -44,6 +47,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutDevice(Device device)
         {
             try
@@ -71,6 +75,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Device>> PostDevice(NewDevice newDevice)
         {
             try
@@ -90,6 +95,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteDevice(int id)
         {
             try

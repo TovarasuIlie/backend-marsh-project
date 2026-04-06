@@ -9,6 +9,6 @@ namespace backend_marsh_project.Entities
         public string Email { get; set; }
         public string Password { get; set; }
         public UserRole Role { get; set; }
-        public string Location {  get; set; }
+        public string Location { get; set; }
     }
 }
