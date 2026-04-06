@@ -1,0 +1,6 @@
+@backend_marsh_project_HostAddress = http://localhost:5128
+
+GET {{backend_marsh_project_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
