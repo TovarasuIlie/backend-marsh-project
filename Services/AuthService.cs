@@ -19,7 +19,7 @@ namespace backend_marsh_project.Services
             _jwtService = jwtService;
         }
 
-        public async Task<string> RegisterUser(RegisterUser registerUser)
+        public async Task<LoggedUser> RegisterUser(RegisterUser registerUser)
         {
             var duplicateEmail = await _context.Users.AnyAsync(u => u.Email == registerUser.Email);
 
@@ -42,10 +42,18 @@ namespace backend_marsh_project.Services
             _context.Users.Add(user);
 
             await _context.SaveChangesAsync();
-            return _jwtService.GenerateToken(user);
+
+            return new LoggedUser
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Location = user.Location,
+                Token = _jwtService.GenerateToken(user)
+            };
         }
 
-        public async Task<string> LoginUser(LoginUser loginUser)
+        public async Task<LoggedUser> LoginUser(LoginUser loginUser)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginUser.Email);
 
@@ -55,13 +63,21 @@ namespace backend_marsh_project.Services
             }
 
             var hasher = new PasswordHasher<User>();
+            var result = hasher.VerifyHashedPassword(user, user.Password, loginUser.Password);
 
-            if(hasher.VerifyHashedPassword(new User(), user.Password, loginUser.Password) != PasswordVerificationResult.Success)
+            if (result == PasswordVerificationResult.Failed)
             {
                 throw new BadRequestException("Email or password is incorrect!");
             }
 
-            return _jwtService.GenerateToken(user);
+            return new LoggedUser
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role,
+                Location = user.Location,
+                Token = _jwtService.GenerateToken(user)
+            };
         }
     }
 }

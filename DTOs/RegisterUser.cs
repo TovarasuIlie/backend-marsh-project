@@ -1,5 +1,6 @@
 ﻿using backend_marsh_project.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace backend_marsh_project.DTOs
 {

@@ -25,13 +25,13 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpPost("register-user")]
-        public async Task<ActionResult<string>> RegisterUser(RegisterUser registerUser)
+        public async Task<ActionResult<LoggedUser>> RegisterUser([FromBody] RegisterUser registerUser)
         {
             try
             {
-                var token = await _authService.RegisterUser(registerUser);
+                var logged = await _authService.RegisterUser(registerUser);
 
-                return Ok(token);
+                return Ok(logged);
             }
             catch (BadRequestException ex)
             {
@@ -40,13 +40,13 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpPost("login-user")]
-        public async Task<ActionResult<string>> LoginUser(LoginUser loginUser)
+        public async Task<ActionResult<LoggedUser>> LoginUser([FromBody] LoginUser loginUser)
         {
             try
             {
-                var token = await _authService.LoginUser(loginUser);
+                var logged = await _authService.LoginUser(loginUser);
 
-                return Ok(token);
+                return Ok(logged);
             }
             catch (BadRequestException ex)
             {
