@@ -20,12 +20,16 @@ namespace backend_marsh_project.Services
 
         public async Task<PagedResult<Device>> GetAllDevices(PaginationParameters paginationParameters)
         {
-            return await _context.Devices.ToPagedResultAsync(paginationParameters);
+            return await _context.Devices
+                .Include(d => d.AssignedToUser)
+                .ToPagedResultAsync(paginationParameters);
         }
 
         public async Task<Device> GetDeviceById(int id)
         {
-            Device? device = await _context.Devices.FindAsync(id);
+            Device? device = await _context.Devices
+                .Include(d => d.AssignedToUser)
+                .FirstOrDefaultAsync(d => d.Id == id);
 
             if (device == null) 
             {
