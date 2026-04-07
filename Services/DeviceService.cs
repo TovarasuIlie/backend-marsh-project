@@ -1,6 +1,8 @@
 ﻿using backend_marsh_project.Data;
 using backend_marsh_project.DTOs;
 using backend_marsh_project.Entities;
+using backend_marsh_project.Entities.Extensions;
+using backend_marsh_project.Entities.Paging;
 using backend_marsh_project.Exceptions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +18,9 @@ namespace backend_marsh_project.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Device>> GetAllDevices()
+        public async Task<PagedResult<Device>> GetAllDevices(PaginationParameters paginationParameters)
         {
-            return await _context.Devices.ToListAsync();
+            return await _context.Devices.ToPagedResultAsync(paginationParameters);
         }
 
         public async Task<Device> GetDeviceById(int id)
@@ -67,19 +69,20 @@ namespace backend_marsh_project.Services
             }
         }
 
-        public async Task<Device> UpdateDevice(Device updatedDevice)
+        public async Task<Device> UpdateDevice(int deviceId, EditDevice updatedDevice)
         {
-            Device? device = await _context.Devices.FindAsync(updatedDevice.Id);
+            Device? device = await _context.Devices.FindAsync(deviceId);
 
             if (device == null)
             {
                 throw new NotFoundException("The device no longer exists in the system.");
             }
 
-            device.OSVersion    = updatedDevice.OSVersion;
-            device.Processor    = updatedDevice.Processor;
-            device.RAMAmount    = updatedDevice.RAMAmount;
-            device.Description  = updatedDevice.Description;
+            device.OperatingSystem = updatedDevice.OperatingSystem;
+            device.OSVersion       = updatedDevice.OSVersion;
+            device.Processor       = updatedDevice.Processor;
+            device.RAMAmount       = updatedDevice.RAMAmount;
+            device.Description     = updatedDevice.Description;
 
             try
             {

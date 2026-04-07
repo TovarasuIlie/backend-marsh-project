@@ -4,6 +4,7 @@ using backend_marsh_project.Services;
 using backend_marsh_project.Exceptions;
 using backend_marsh_project.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using backend_marsh_project.Entities.Paging;
 
 namespace backend_marsh_project.Controllers
 {
@@ -19,9 +20,9 @@ namespace backend_marsh_project.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<IEnumerable<Device>>> GetDevices()
+        public async Task<ActionResult<PagedResult<Device>>> GetDevices([FromQuery] PaginationParameters paginationParameters)
         {
-            var devices = await _deviceService.GetAllDevices();
+            var devices = await _deviceService.GetAllDevices(paginationParameters);
 
             return Ok(devices);
         }
@@ -48,11 +49,11 @@ namespace backend_marsh_project.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> PutDevice(Device device)
+        public async Task<IActionResult> PutDevice(int id, [FromBody] EditDevice editDevice)
         {
             try
             {
-                var result = await _deviceService.UpdateDevice(device);
+                var result = await _deviceService.UpdateDevice(id, editDevice);
 
                 return Ok(result);
             }
@@ -76,7 +77,7 @@ namespace backend_marsh_project.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<Device>> PostDevice(NewDevice newDevice)
+        public async Task<ActionResult<Device>> PostDevice([FromBody] NewDevice newDevice)
         {
             try
             {
