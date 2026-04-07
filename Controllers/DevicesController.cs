@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using backend_marsh_project.DTOs;
 using backend_marsh_project.Entities;
-using backend_marsh_project.Services;
-using backend_marsh_project.Exceptions;
-using backend_marsh_project.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using backend_marsh_project.Entities.Paging;
+using backend_marsh_project.Exceptions;
+using backend_marsh_project.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace backend_marsh_project.Controllers
 {
@@ -48,7 +49,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "SuperAdmin, InventoryManager")]
         public async Task<IActionResult> PutDevice(int id, [FromBody] EditDevice editDevice)
         {
             try
@@ -76,7 +77,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "SuperAdmin, InventoryManager")]
         public async Task<ActionResult<Device>> PostDevice([FromBody] NewDevice newDevice)
         {
             try
@@ -96,7 +97,7 @@ namespace backend_marsh_project.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "SuperAdmin, InventoryManager")]
         public async Task<IActionResult> DeleteDevice(int id)
         {
             try

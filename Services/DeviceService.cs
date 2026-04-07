@@ -22,6 +22,25 @@ namespace backend_marsh_project.Services
         {
             return await _context.Devices
                 .Include(d => d.AssignedToUser)
+                .Select(d => new Device
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    Manufacturer = d.Manufacturer,
+                    Processor = d.Processor,
+                    OperatingSystem = d.OperatingSystem,
+                    OSVersion = d.OSVersion,
+                    RAMAmount = d.RAMAmount,
+                    Description = d.Description,
+                    AssignedToUser = d.AssignedToUser == null ? null : new User
+                    {
+                        Id = d.AssignedToUser.Id,
+                        Name = d.AssignedToUser.Name,
+                        Email = d.AssignedToUser.Email,
+                        Role = d.AssignedToUser.Role,
+                        Location = d.AssignedToUser.Location
+                    }
+                })
                 .ToPagedResultAsync(paginationParameters);
         }
 
@@ -29,6 +48,25 @@ namespace backend_marsh_project.Services
         {
             Device? device = await _context.Devices
                 .Include(d => d.AssignedToUser)
+                .Select(d => new Device
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    Manufacturer = d.Manufacturer,
+                    Processor = d.Processor,
+                    OperatingSystem = d.OperatingSystem,
+                    OSVersion = d.OSVersion,
+                    RAMAmount = d.RAMAmount,
+                    Description = d.Description,
+                    AssignedToUser = d.AssignedToUser == null ? null : new User
+                    {
+                        Id = d.AssignedToUser.Id,
+                        Name = d.AssignedToUser.Name,
+                        Email = d.AssignedToUser.Email,
+                        Role = d.AssignedToUser.Role,
+                        Location = d.AssignedToUser.Location
+                    }
+                })
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (device == null) 
