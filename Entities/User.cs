@@ -10,6 +10,7 @@ namespace backend_marsh_project.Entities
         public string Email { get; set; }
         [JsonIgnore]
         public string Password { get; set; }
+        public List<Device> Devices { get; set; }
         public UserRole Role { get; set; }
         public string Location { get; set; }
     }

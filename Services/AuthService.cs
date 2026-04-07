@@ -4,6 +4,7 @@ using backend_marsh_project.Entities;
 using backend_marsh_project.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 
 namespace backend_marsh_project.Services
 {
@@ -78,6 +79,40 @@ namespace backend_marsh_project.Services
                 Location = user.Location,
                 Token = _jwtService.GenerateToken(user)
             };
+        }
+
+        public async Task<OverviewUser> GetUserData(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Devices)
+                .Where(u => u.Id == userId)
+                .Select(u => new OverviewUser
+                {
+                    Name = u.Name,
+                    Email = u.Email,
+                    Location = u.Location,
+                    Role = u.Role,
+                    Devices = u.Devices.Select(d => new Device
+                    {
+                        Id = d.Id,
+                        Manufacturer = d.Manufacturer,
+                        Name = d.Name,
+                        Type = d.Type,
+                        RAMAmount = d.RAMAmount,
+                        Processor = d.Processor,
+                        OSVersion = d.OSVersion,
+                        OperatingSystem = d.OperatingSystem,
+                        Description = d.Description
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                throw new NotFoundException("User not found!");
+            }
+
+            return user;
         }
     }
 }

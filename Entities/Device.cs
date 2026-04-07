@@ -15,6 +15,5 @@ namespace backend_marsh_project.Entities
         public string Processor {  get; set; }
         public int RAMAmount { get; set; }
         public string Description { get; set; }
-
     }
 }

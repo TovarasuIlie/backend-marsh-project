@@ -24,11 +24,14 @@ builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            NameClaimType = "sub",
+            RoleClaimType = "role",
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
