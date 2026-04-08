@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>backend_marsh_project</RootNamespace>
+    <RootNamespace>BackendMarshProject</RootNamespace>
     <UserSecretsId>cebb4dfc-922a-45a7-970f-e0974b6ccd65</UserSecretsId>
   </PropertyGroup>
 
