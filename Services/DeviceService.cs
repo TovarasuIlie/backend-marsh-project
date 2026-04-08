@@ -12,10 +12,12 @@ namespace backend_marsh_project.Services
     public class DeviceService
     {
         private readonly AppDbContext _context;
+        private readonly LLMService _LLMService;
 
-        public DeviceService(AppDbContext context)
+        public DeviceService(AppDbContext context, LLMService lLMService)
         {
             _context = context;
+            _LLMService = lLMService;
         }
 
         public async Task<PagedResult<Device>> GetAllDevices(PaginationParameters paginationParameters)
@@ -149,6 +151,25 @@ namespace backend_marsh_project.Services
 
             _context.Devices.Remove(device);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Object> GetGeneratedMessage(int id)
+        {
+            Device? device = await _context.Devices.FindAsync(id);
+
+            if (device == null)
+            {
+                throw new NotFoundException("The device no longer exists in the system.");
+            }
+
+            string inputMessage = $"Input: Name – {device.Name}, " +
+                $"Manufacturer – {device.Manufacturer}, " +
+                $"OS – {device.OperatingSystem} {device.OSVersion}, " +
+                $"Type – {device.Type.ToString()}, " +
+                $"RAM – {device.RAMAmount}GB, " +
+                $"Processor – {device.Processor}";
+
+            return new { message = await _LLMService.GeneratedResponse(inputMessage) };
         }
     }
 }

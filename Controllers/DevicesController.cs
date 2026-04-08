@@ -110,5 +110,25 @@ namespace backend_marsh_project.Controllers
                 return NotFound(new { message = ex.Message });
             }
         }
+
+        [HttpGet("generate-response/{id}")]
+        [Authorize]
+        public async Task<ActionResult<Object>> GetLLMResponse(int id)
+        {
+            try
+            {
+                var device = await _deviceService.GetGeneratedMessage(id);
+
+                return Ok(device);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
+            }
+        }
     }
 }

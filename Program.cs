@@ -22,6 +22,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
+builder.Services.AddScoped<LLMService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -85,6 +86,14 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
                 Errors = errors
             });
     };
+});
+
+builder.Services.AddHttpClient("AI-HttpClient", httpClient =>
+{
+    httpClient.BaseAddress = new Uri("https://api.groq.com");
+}).ConfigurePrimaryHttpMessageHandler(_ => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
 });
 
 
