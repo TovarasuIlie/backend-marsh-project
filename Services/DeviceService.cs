@@ -200,5 +200,44 @@ namespace backend_marsh_project.Services
 
             return new { message = await _LLMService.GeneratedResponse(inputMessage) };
         }
+
+        public async Task ToggleAssignStatus(int deviceId, int userId)
+        {
+            Device? device = await _context.Devices.FindAsync(deviceId);
+
+            if (device == null)
+            {
+                throw new NotFoundException("The device no longer exists in the system.");
+            }
+
+            User? user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                throw new BadRequestException("The device no longer exists in the system.");
+            }
+
+            if (device.AssignedToUser is null)
+            {
+                device.AssignedToUser = user;
+            }
+            else
+            {
+                if (device.AssignedToUser.Id != userId)
+                {
+                    throw new BadRequestException("You can't unassign this device.");
+                }
+                device.AssignedToUser = null;
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new ConflictException("Another user updated this device while you were editing.");
+            }
+        }
     }
 }

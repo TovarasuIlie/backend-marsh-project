@@ -116,10 +116,14 @@ namespace backend_marsh_project.Controllers
         public async Task<ActionResult<PagedResult<Device>>> GetDeviceOverview([FromQuery] PaginationParameters paginationParameters)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new { message = "Invalid user token." });
+            }
 
             try
             {
-                var devices = await _deviceService.GetMyAndUnassignedDevices(paginationParameters, int.Parse(userIdString));
+                var devices = await _deviceService.GetMyAndUnassignedDevices(paginationParameters, userId);
 
                 return Ok(devices);
             }
@@ -142,6 +146,28 @@ namespace backend_marsh_project.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
+            }
+        }
+
+        [HttpPatch("toggle-device-assign-status/{id}")]
+        [Authorize]
+        public async Task<ActionResult<Object>> ToggleDeviceAssignStatus(int id)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new { message = "Invalid user token." });
+            }
+
+            try
+            {
+                await _deviceService.ToggleAssignStatus(id, userId);
+
+                return Ok(new { message = "Device assign status has been change successfully." });
             }
             catch (Exception)
             {
