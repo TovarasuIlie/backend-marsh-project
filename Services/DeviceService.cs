@@ -46,6 +46,35 @@ namespace backend_marsh_project.Services
                 .ToPagedResultAsync(paginationParameters);
         }
 
+        public async Task<PagedResult<Device>> GetMyAndUnassignedDevices(PaginationParameters paginationParameters, int userId)
+        {
+            return await _context.Devices
+                .Include(d => d.AssignedToUser)
+                .Where(d => d.AssignedToUser == null || d.AssignedToUser.Id == userId)
+                .Select(d => new Device
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    Manufacturer = d.Manufacturer,
+                    Processor = d.Processor,
+                    OperatingSystem = d.OperatingSystem,
+                    OSVersion = d.OSVersion,
+                    RAMAmount = d.RAMAmount,
+                    Description = d.Description,
+                    AssignedToUser = d.AssignedToUser == null ? null : new User
+                    {
+                        Id = d.AssignedToUser.Id,
+                        Name = d.AssignedToUser.Name,
+                        Email = d.AssignedToUser.Email,
+                        Role = d.AssignedToUser.Role,
+                        Location = d.AssignedToUser.Location
+                    }
+                })
+                .OrderByDescending(d => d.AssignedToUser.Id)
+                .ThenBy(d => d.Id)
+                .ToPagedResultAsync(paginationParameters);
+        }
+
         public async Task<Device> GetDeviceById(int id)
         {
             Device? device = await _context.Devices

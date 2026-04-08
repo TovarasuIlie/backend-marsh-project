@@ -11,15 +11,15 @@ namespace backend_marsh_project.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class DevicesController : ControllerBase
+    public class DeviceController : ControllerBase
     {
         private readonly DeviceService _deviceService;
-        public DevicesController(DeviceService deviceService) 
+        public DeviceController(DeviceService deviceService) 
         { 
             _deviceService = deviceService;
         }
 
-        [HttpGet]
+        [HttpGet("get-devices")]
         [Authorize]
         public async Task<ActionResult<PagedResult<Device>>> GetDevices([FromQuery] PaginationParameters paginationParameters)
         {
@@ -28,7 +28,7 @@ namespace backend_marsh_project.Controllers
             return Ok(devices);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-device/{id}")]
         [Authorize]
         public async Task<ActionResult<Device>> GetDevice(int id)
         {
@@ -48,9 +48,9 @@ namespace backend_marsh_project.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPatch("edit-device/{id}")]
         [Authorize(Roles = "SuperAdmin, InventoryManager")]
-        public async Task<IActionResult> PutDevice(int id, [FromBody] EditDevice editDevice)
+        public async Task<IActionResult> EditDevice(int id, [FromBody] EditDevice editDevice)
         {
             try
             {
@@ -76,9 +76,9 @@ namespace backend_marsh_project.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("add-device")]
         [Authorize(Roles = "SuperAdmin, InventoryManager")]
-        public async Task<ActionResult<Device>> PostDevice([FromBody] NewDevice newDevice)
+        public async Task<ActionResult<Device>> AddDevice([FromBody] NewDevice newDevice)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace backend_marsh_project.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-device/{id}")]
         [Authorize(Roles = "SuperAdmin, InventoryManager")]
         public async Task<IActionResult> DeleteDevice(int id)
         {
@@ -108,6 +108,24 @@ namespace backend_marsh_project.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("get-devices-overview")]
+        [Authorize]
+        public async Task<ActionResult<PagedResult<Device>>> GetDeviceOverview([FromQuery] PaginationParameters paginationParameters)
+        {
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            try
+            {
+                var devices = await _deviceService.GetMyAndUnassignedDevices(paginationParameters, int.Parse(userIdString));
+
+                return Ok(devices);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
             }
         }
 
