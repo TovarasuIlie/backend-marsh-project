@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace backend_marsh_project.Entities.Paging
+namespace BackendMarshProject.Entities.Paging
 {
     public class PaginationParameters
     {

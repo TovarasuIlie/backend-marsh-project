@@ -1,7 +1,7 @@
-﻿using backend_marsh_project.Entities;
+﻿using BackendMarshProject.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend_marsh_project.Data
+namespace BackendMarshProject.Data
 {
     public class AppDbContext: DbContext
     {

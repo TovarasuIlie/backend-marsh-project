@@ -1,12 +1,11 @@
-﻿using backend_marsh_project.Data;
-using backend_marsh_project.DTOs;
-using backend_marsh_project.Entities;
-using backend_marsh_project.Exceptions;
+﻿using BackendMarshProject.Data;
+using BackendMarshProject.DTOs;
+using BackendMarshProject.Entities;
+using BackendMarshProject.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Versioning;
 
-namespace backend_marsh_project.Services
+namespace BackendMarshProject.Services
 {
     public class AuthService
     {

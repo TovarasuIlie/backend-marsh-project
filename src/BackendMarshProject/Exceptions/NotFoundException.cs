@@ -1,4 +1,4 @@
-﻿namespace backend_marsh_project.Exceptions
+﻿namespace BackendMarshProject.Exceptions
 {
     public class NotFoundException: Exception
     {

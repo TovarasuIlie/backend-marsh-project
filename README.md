@@ -1,2 +1,2 @@
 # backend-marsh-project
-SuperAdmin credentials admin@itcorp.com / MyPass123
+SuperAdmin credentials admin@itcorp.com / MyPass!1

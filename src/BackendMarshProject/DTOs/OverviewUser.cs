@@ -1,7 +1,7 @@
-﻿using backend_marsh_project.Entities;
-using backend_marsh_project.Enums;
+﻿using BackendMarshProject.Entities;
+using BackendMarshProject.Enums;
 
-namespace backend_marsh_project.DTOs
+namespace BackendMarshProject.DTOs
 {
     public class OverviewUser
     {

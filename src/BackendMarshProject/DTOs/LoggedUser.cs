@@ -1,6 +1,6 @@
-﻿using backend_marsh_project.Enums;
+﻿using BackendMarshProject.Enums;
 
-namespace backend_marsh_project.DTOs
+namespace BackendMarshProject.DTOs
 {
     public class LoggedUser
     {

@@ -1,4 +1,4 @@
-﻿namespace backend_marsh_project.Enums
+﻿namespace BackendMarshProject.Enums
 {
     public enum DeviceType
     {

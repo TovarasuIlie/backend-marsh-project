@@ -1,7 +1,7 @@
-﻿using backend_marsh_project.Entities.Paging;
+﻿using BackendMarshProject.Entities.Paging;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend_marsh_project.Entities.Extensions
+namespace BackendMarshProject.Entities.Extensions
 {
     public static class QueryableExtensions
     {

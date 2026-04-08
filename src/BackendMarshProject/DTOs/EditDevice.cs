@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace backend_marsh_project.DTOs
+namespace BackendMarshProject.DTOs
 {
     public class EditDevice
     {

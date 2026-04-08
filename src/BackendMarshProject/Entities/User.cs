@@ -1,7 +1,7 @@
-﻿using backend_marsh_project.Enums;
+﻿using BackendMarshProject.Enums;
 using System.Text.Json.Serialization;
 
-namespace backend_marsh_project.Entities
+namespace BackendMarshProject.Entities
 {
     public class User
     {

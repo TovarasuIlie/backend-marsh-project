@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace backend_marsh_project.DTOs
+namespace BackendMarshProject.DTOs
 {
     public class LLMSendMessage
     {

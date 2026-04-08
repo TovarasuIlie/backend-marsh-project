@@ -1,13 +1,12 @@
-﻿using backend_marsh_project.Data;
-using backend_marsh_project.DTOs;
-using backend_marsh_project.Entities;
-using backend_marsh_project.Entities.Extensions;
-using backend_marsh_project.Entities.Paging;
-using backend_marsh_project.Exceptions;
-using Microsoft.Data.SqlClient;
+﻿using BackendMarshProject.Data;
+using BackendMarshProject.DTOs;
+using BackendMarshProject.Entities;
+using BackendMarshProject.Entities.Extensions;
+using BackendMarshProject.Entities.Paging;
+using BackendMarshProject.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
-namespace backend_marsh_project.Services
+namespace BackendMarshProject.Services
 {
     public class DeviceService
     {
@@ -89,6 +88,7 @@ namespace backend_marsh_project.Services
                     OSVersion = d.OSVersion,
                     RAMAmount = d.RAMAmount,
                     Description = d.Description,
+                    Type = d.Type,
                     AssignedToUser = d.AssignedToUser == null ? null : new User
                     {
                         Id = d.AssignedToUser.Id,
@@ -102,7 +102,7 @@ namespace backend_marsh_project.Services
 
             if (device == null) 
             {
-                throw new NotFoundException($"The device with ID {id} was not found.");
+                throw new NotFoundException("The device no longer exists in the system.");
             }
 
             return device;
@@ -110,11 +110,9 @@ namespace backend_marsh_project.Services
 
         public async Task<Device> AddNewDevice(NewDevice newDevice)
         {
-            var duplicateDevice = await _context.Devices.AnyAsync(d => d.Name == newDevice.Name && d.Manufacturer == newDevice.Manufacturer && d.Type == newDevice.Type && d.RAMAmount == newDevice.RAMAmount);
-
-            if (duplicateDevice)
+            if (await IsConfigurationDuplicate(newDevice))
             {
-                throw new BadRequestException("This device already exists.");
+                throw new BadRequestException("This device already registred in the system.");
             }
 
             Device device = new Device
@@ -238,6 +236,19 @@ namespace backend_marsh_project.Services
             {
                 throw new ConflictException("Another user updated this device while you were editing.");
             }
+        }
+
+        private async Task<bool> IsConfigurationDuplicate(NewDevice newDevice)
+        {
+            return await _context.Devices.AnyAsync(d =>
+                d.Name == newDevice.Name &&
+                d.Manufacturer == newDevice.Manufacturer &&
+                d.Processor == newDevice.Processor &&
+                d.OperatingSystem == newDevice.OperatingSystem &&
+                d.OSVersion == newDevice.OSVersion &&
+                d.Type == newDevice.Type &&
+                d.RAMAmount == newDevice.RAMAmount
+            );
         }
     }
 }

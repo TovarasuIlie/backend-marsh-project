@@ -1,5 +1,5 @@
-using backend_marsh_project.Data;
-using backend_marsh_project.Services;
+using BackendMarshProject.Data;
+using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

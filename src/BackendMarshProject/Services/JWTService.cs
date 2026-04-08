@@ -1,12 +1,11 @@
-﻿using backend_marsh_project.Entities;
-using Microsoft.IdentityModel.JsonWebTokens;
+﻿using BackendMarshProject.Entities;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using JwtRegisteredClaimNames = System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames;
 
-namespace backend_marsh_project.Services
+namespace BackendMarshProject.Services
 {
     public interface IJWTService
     {

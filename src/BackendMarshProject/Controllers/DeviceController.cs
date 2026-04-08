@@ -1,13 +1,13 @@
-﻿using backend_marsh_project.DTOs;
-using backend_marsh_project.Entities;
-using backend_marsh_project.Entities.Paging;
-using backend_marsh_project.Exceptions;
-using backend_marsh_project.Services;
+﻿using BackendMarshProject.DTOs;
+using BackendMarshProject.Entities;
+using BackendMarshProject.Entities.Paging;
+using BackendMarshProject.Exceptions;
+using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace backend_marsh_project.Controllers
+namespace BackendMarshProject.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

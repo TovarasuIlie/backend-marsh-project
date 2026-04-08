@@ -1,7 +1,7 @@
-﻿using backend_marsh_project.Enums;
+﻿using BackendMarshProject.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace backend_marsh_project.DTOs
+namespace BackendMarshProject.DTOs
 {
     public class NewDevice
     {

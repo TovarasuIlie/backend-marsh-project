@@ -1,4 +1,4 @@
-﻿namespace backend_marsh_project.Entities.Paging
+﻿namespace BackendMarshProject.Entities.Paging
 {
     public class PagedResult<T>
     {

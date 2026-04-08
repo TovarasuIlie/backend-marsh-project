@@ -1,10 +1,8 @@
-﻿using Azure;
-using backend_marsh_project.DTOs;
-using backend_marsh_project.Entities;
+﻿using BackendMarshProject.DTOs;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace backend_marsh_project.Services
+namespace BackendMarshProject.Services
 {
     public class LLMService
     {
