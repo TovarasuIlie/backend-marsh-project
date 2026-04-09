@@ -5,6 +5,7 @@ using BackendMarshProject.Exceptions;
 using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace BackendMarshProject.Controllers
@@ -23,6 +24,11 @@ namespace BackendMarshProject.Controllers
         [Authorize]
         public async Task<ActionResult<PagedResult<Device>>> GetDevices([FromQuery] PaginationParameters paginationParameters)
         {
+            if (!ModelState.IsValid)
+            { 
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
+            }
+
             var devices = await _deviceService.GetAllDevices(paginationParameters);
 
             return Ok(devices);
@@ -50,8 +56,13 @@ namespace BackendMarshProject.Controllers
 
         [HttpPatch("edit-device/{id}")]
         [Authorize(Roles = "SuperAdmin, InventoryManager")]
-        public async Task<IActionResult> EditDevice(int id, [FromBody] EditDevice editDevice)
+        public async Task<ActionResult<Device>> EditDevice(int id, [FromBody] EditDevice editDevice)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
+            }
+
             try
             {
                 var result = await _deviceService.UpdateDevice(id, editDevice);
@@ -80,6 +91,11 @@ namespace BackendMarshProject.Controllers
         [Authorize(Roles = "SuperAdmin, InventoryManager")]
         public async Task<ActionResult<Device>> AddDevice([FromBody] NewDevice newDevice)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
+            }
+
             try
             {
                 var device = await _deviceService.AddNewDevice(newDevice);
@@ -113,8 +129,13 @@ namespace BackendMarshProject.Controllers
 
         [HttpGet("get-devices-overview")]
         [Authorize]
-        public async Task<ActionResult<PagedResult<Device>>> GetDeviceOverview([FromQuery] PaginationParameters paginationParameters)
+        public async Task<ActionResult<PagedResult<Device>>> GetDevicesOverview([FromQuery] PaginationParameters paginationParameters)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
+            }
+
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId))
             {
