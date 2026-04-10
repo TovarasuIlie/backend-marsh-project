@@ -1,12 +1,10 @@
-﻿using Azure;
-using BackendMarshProject.Controllers;
+﻿using BackendMarshProject.Controllers;
 using BackendMarshProject.Data;
 using BackendMarshProject.Entities;
 using BackendMarshProject.Entities.Paging;
 using BackendMarshProject.Enums;
 using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
