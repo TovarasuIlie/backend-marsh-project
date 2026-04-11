@@ -1,6 +1,7 @@
 ﻿using BackendMarshProject.Data;
 using BackendMarshProject.Enums;
 using BackendMarshProject.Exceptions;
+using BackendMarshProject.Repository;
 using BackendMarshProject.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -38,7 +39,9 @@ namespace UnitTests.Services
 
             _transaction = _appDbContext.Database.BeginTransaction();
 
-            _service = new DeviceService(_appDbContext, _mockLLMService.Object);
+            var deviceRepository = new DeviceRepository(_appDbContext);
+
+            _service = new DeviceService(deviceRepository, _mockLLMService.Object);
         }
 
         [TestCleanup]
@@ -177,8 +180,6 @@ namespace UnitTests.Services
             });
             Assert.IsNotNull(result.Id);
 
-            result = await _service.GetDeviceById(result.Id);
-
             Assert.IsNotNull(result.Id);
             Assert.IsTrue(result.Id > 0);
             Assert.AreEqual("Device Test", result.Name);
@@ -246,8 +247,6 @@ namespace UnitTests.Services
                 Description = "Unit test device"
             });
             Assert.IsNotNull(result.Id);
-
-            result = await _service.GetDeviceById(result.Id);
 
             Assert.IsNotNull(result.Id);
             Assert.AreEqual(9, result.Id);

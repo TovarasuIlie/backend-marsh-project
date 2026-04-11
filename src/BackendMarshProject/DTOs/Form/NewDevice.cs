@@ -1,7 +1,7 @@
 ﻿using BackendMarshProject.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace BackendMarshProject.DTOs
+namespace BackendMarshProject.DTOs.Form
 {
     public class NewDevice
     {

@@ -1,4 +1,6 @@
 ﻿using BackendMarshProject.DTOs;
+using BackendMarshProject.DTOs.Form;
+using BackendMarshProject.DTOs.User;
 using BackendMarshProject.Exceptions;
 using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -58,7 +60,7 @@ namespace BackendMarshProject.Controllers
 
         [HttpGet("user-overview")]
         [Authorize]
-        public async Task<ActionResult<OverviewUser>> UserOverview()
+        public async Task<ActionResult<UserDTO>> UserOverview()
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

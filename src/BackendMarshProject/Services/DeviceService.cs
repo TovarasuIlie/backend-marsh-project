@@ -1,104 +1,42 @@
 ﻿using BackendMarshProject.Data;
-using BackendMarshProject.DTOs;
+using BackendMarshProject.DTOs.Device;
+using BackendMarshProject.DTOs.Form;
 using BackendMarshProject.Entities;
 using BackendMarshProject.Entities.Extensions;
 using BackendMarshProject.Entities.Paging;
 using BackendMarshProject.Exceptions;
+using BackendMarshProject.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendMarshProject.Services
 {
     public class DeviceService
     {
-        private readonly AppDbContext _context;
+        private readonly IDeviceReposity _deviceReposity;
         private readonly LLMService _LLMService;
 
-        public DeviceService(AppDbContext context, LLMService lLMService)
+        public DeviceService(IDeviceReposity deviceReposity, LLMService lLMService)
         {
-            _context = context;
+            _deviceReposity = deviceReposity;
             _LLMService = lLMService;
         }
 
-        public async Task<PagedResult<Device>> GetAllDevices(PaginationParameters paginationParameters)
+        public async Task<PagedResult<DeviceDTO>> GetAllDevices(PaginationParameters paginationParameters)
         {
-            return await _context.Devices
-                .Include(d => d.AssignedToUser)
-                .Select(d => new Device
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Manufacturer = d.Manufacturer,
-                    Processor = d.Processor,
-                    OperatingSystem = d.OperatingSystem,
-                    OSVersion = d.OSVersion,
-                    RAMAmount = d.RAMAmount,
-                    Description = d.Description,
-                    AssignedToUser = d.AssignedToUser == null ? null : new User
-                    {
-                        Id = d.AssignedToUser.Id,
-                        Name = d.AssignedToUser.Name,
-                        Email = d.AssignedToUser.Email,
-                        Role = d.AssignedToUser.Role,
-                        Location = d.AssignedToUser.Location
-                    }
-                })
-                .ToPagedResultAsync(paginationParameters);
+            return await _deviceReposity.GetAllDevices().ToPagedResultAsync(paginationParameters);
         }
 
-        public async Task<PagedResult<Device>> GetMyAndUnassignedDevices(PaginationParameters paginationParameters, int userId)
+        public async Task<PagedResult<DeviceDTO>> GetMyAndUnassignedDevices(PaginationParameters paginationParameters, int userId)
         {
-            return await _context.Devices
-                .Include(d => d.AssignedToUser)
-                .Where(d => d.AssignedToUser == null || d.AssignedToUser.Id == userId)
-                .Select(d => new Device
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Manufacturer = d.Manufacturer,
-                    Processor = d.Processor,
-                    OperatingSystem = d.OperatingSystem,
-                    OSVersion = d.OSVersion,
-                    RAMAmount = d.RAMAmount,
-                    Description = d.Description,
-                    AssignedToUser = d.AssignedToUser == null ? null : new User
-                    {
-                        Id = d.AssignedToUser.Id,
-                        Name = d.AssignedToUser.Name,
-                        Email = d.AssignedToUser.Email,
-                        Role = d.AssignedToUser.Role,
-                        Location = d.AssignedToUser.Location
-                    }
-                })
+            return await _deviceReposity.GetAllUnassignedDevices(userId)
                 .OrderByDescending(d => d.AssignedToUser.Id)
                 .ThenBy(d => d.Id)
                 .ToPagedResultAsync(paginationParameters);
         }
 
-        public async Task<Device> GetDeviceById(int id)
+        public async Task<DeviceDTO?> GetDeviceById(int id)
         {
-            Device? device = await _context.Devices
-                .Include(d => d.AssignedToUser)
-                .Select(d => new Device
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Manufacturer = d.Manufacturer,
-                    Processor = d.Processor,
-                    OperatingSystem = d.OperatingSystem,
-                    OSVersion = d.OSVersion,
-                    RAMAmount = d.RAMAmount,
-                    Description = d.Description,
-                    Type = d.Type,
-                    AssignedToUser = d.AssignedToUser == null ? null : new User
-                    {
-                        Id = d.AssignedToUser.Id,
-                        Name = d.AssignedToUser.Name,
-                        Email = d.AssignedToUser.Email,
-                        Role = d.AssignedToUser.Role,
-                        Location = d.AssignedToUser.Location
-                    }
-                })
-                .FirstOrDefaultAsync(d => d.Id == id);
+            DeviceDTO? device = await _deviceReposity.GetDeviceById(id).FirstOrDefaultAsync();
 
             if (device == null) 
             {
@@ -110,7 +48,8 @@ namespace BackendMarshProject.Services
 
         public async Task<Device> AddNewDevice(NewDevice newDevice)
         {
-            if (await IsConfigurationDuplicate(newDevice))
+            
+            if (await _deviceReposity.IsDuplicate(newDevice))
             {
                 throw new BadRequestException("This device already registred in the system.");
             }
@@ -127,11 +66,10 @@ namespace BackendMarshProject.Services
                 Description = newDevice.Description
             };
 
-            _context.Devices.Add(device);
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _deviceReposity.CreateDeviceAsync(device);
+
                 return device;
             }
             catch (DbUpdateException)
@@ -142,7 +80,7 @@ namespace BackendMarshProject.Services
 
         public async Task<Device> UpdateDevice(int deviceId, EditDevice updatedDevice)
         {
-            Device? device = await _context.Devices.FindAsync(deviceId);
+            Device? device = await _deviceReposity.GetDeviceByIdAsync(deviceId);
 
             if (device == null)
             {
@@ -155,9 +93,14 @@ namespace BackendMarshProject.Services
             device.RAMAmount       = updatedDevice.RAMAmount;
             device.Description     = updatedDevice.Description;
 
+            if (await _deviceReposity.IsDuplicate(device))
+            {
+                throw new BadRequestException("This device already registred in the system.");
+            }
+
             try
             {
-                await _context.SaveChangesAsync();
+                await _deviceReposity.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -169,20 +112,19 @@ namespace BackendMarshProject.Services
 
         public async Task DeleteDevice(int id)
         {
-            Device? device = await _context.Devices.FindAsync(id);
+            Device? device = await _deviceReposity.GetDeviceByIdAsync(id);
 
             if (device == null)
             {
                 throw new NotFoundException("The device no longer exists in the system.");
             }
 
-            _context.Devices.Remove(device);
-            await _context.SaveChangesAsync();
+            await _deviceReposity.DeleteDeviceAsync(device);
         }
 
         public async Task<Object> GetGeneratedMessage(int id)
         {
-            Device? device = await _context.Devices.FindAsync(id);
+            Device? device = await _deviceReposity.GetDeviceByIdAsync(id);
 
             if (device == null)
             {
@@ -201,54 +143,34 @@ namespace BackendMarshProject.Services
 
         public async Task ToggleAssignStatus(int deviceId, int userId)
         {
-            Device? device = await _context.Devices.FindAsync(deviceId);
+            Device? device = await _deviceReposity.GetDeviceByIdAsync(deviceId);
 
             if (device == null)
             {
                 throw new NotFoundException("The device no longer exists in the system.");
             }
 
-            User? user = await _context.Users.FindAsync(userId);
-
-            if (user == null)
+            if (device.AssignedToUserId == null)
             {
-                throw new BadRequestException("The device no longer exists in the system.");
+                device.AssignedToUserId = userId;
             }
-
-            if (device.AssignedToUser is null)
+            else if (device.AssignedToUserId == userId)
             {
-                device.AssignedToUser = user;
+                device.AssignedToUserId = null;
             }
             else
             {
-                if (device.AssignedToUser.Id != userId)
-                {
-                    throw new BadRequestException("You can't unassign this device.");
-                }
-                device.AssignedToUser = null;
+                throw new BadRequestException("You can't unassign this device.");
             }
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _deviceReposity.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
                 throw new ConflictException("Another user updated this device while you were editing.");
             }
-        }
-
-        private async Task<bool> IsConfigurationDuplicate(NewDevice newDevice)
-        {
-            return await _context.Devices.AnyAsync(d =>
-                d.Name == newDevice.Name &&
-                d.Manufacturer == newDevice.Manufacturer &&
-                d.Processor == newDevice.Processor &&
-                d.OperatingSystem == newDevice.OperatingSystem &&
-                d.OSVersion == newDevice.OSVersion &&
-                d.Type == newDevice.Type &&
-                d.RAMAmount == newDevice.RAMAmount
-            );
         }
     }
 }

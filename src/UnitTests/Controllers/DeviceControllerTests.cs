@@ -1,8 +1,10 @@
 ﻿using BackendMarshProject.Controllers;
 using BackendMarshProject.Data;
+using BackendMarshProject.DTOs.Device;
 using BackendMarshProject.Entities;
 using BackendMarshProject.Entities.Paging;
 using BackendMarshProject.Enums;
+using BackendMarshProject.Repository;
 using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +42,9 @@ namespace UnitTests.Controller
 
             _transaction = _appDbContext.Database.BeginTransaction();
 
-            _service = new DeviceService(_appDbContext, _mockLLMService.Object);
+            var deviceRepository = new DeviceRepository(_appDbContext);
+
+            _service = new DeviceService(deviceRepository, _mockLLMService.Object);
 
             _controller = new DeviceController(_service);
         }
@@ -70,7 +74,7 @@ namespace UnitTests.Controller
             Assert.IsNotNull(okResult);
             Assert.IsNotNull(okResult.Value);
 
-            var pagedResult = okResult.Value as PagedResult<Device>;
+            var pagedResult = okResult.Value as PagedResult<DeviceDTO>;
             Assert.IsNotNull(pagedResult);
             Assert.AreEqual(5, pagedResult.Data.Count());
         }

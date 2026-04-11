@@ -1,7 +1,10 @@
 ﻿using BackendMarshProject.Data;
 using BackendMarshProject.DTOs;
+using BackendMarshProject.DTOs.Form;
+using BackendMarshProject.DTOs.User;
 using BackendMarshProject.Entities;
 using BackendMarshProject.Exceptions;
+using BackendMarshProject.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,21 +12,19 @@ namespace BackendMarshProject.Services
 {
     public class AuthService
     {
-        private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
         private readonly IJWTService _jwtService;
 
 
-        public AuthService(AppDbContext context, IJWTService jwtService)
+        public AuthService(IUserRepository userRepository, IJWTService jwtService)
         {
-            _context = context;
+            _userRepository = userRepository;
             _jwtService = jwtService;
         }
 
         public async Task<LoggedUser> RegisterUser(RegisterUser registerUser)
         {
-            var duplicateEmail = await _context.Users.AnyAsync(u => u.Email == registerUser.Email);
-
-            if(duplicateEmail)
+            if(await _userRepository.IsDuplicateEmail(registerUser.Email))
             {
                 throw new BadRequestException("This email address is took by another user!");
             }
@@ -39,9 +40,7 @@ namespace BackendMarshProject.Services
                 Location = registerUser.Location
             };
 
-            _context.Users.Add(user);
-
-            await _context.SaveChangesAsync();
+            await _userRepository.AddUserAsync(user);
 
             return new LoggedUser
             {
@@ -55,7 +54,7 @@ namespace BackendMarshProject.Services
 
         public async Task<LoggedUser> LoginUser(LoginUser loginUser)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginUser.Email);
+            var user = await _userRepository.GetUserByEmail(loginUser.Email);
 
             if (user == null)
             {
@@ -80,31 +79,9 @@ namespace BackendMarshProject.Services
             };
         }
 
-        public async Task<OverviewUser> GetUserData(int userId)
+        public async Task<UserDTO> GetUserData(int userId)
         {
-            var user = await _context.Users
-                .Include(u => u.Devices)
-                .Where(u => u.Id == userId)
-                .Select(u => new OverviewUser
-                {
-                    Name = u.Name,
-                    Email = u.Email,
-                    Location = u.Location,
-                    Role = u.Role,
-                    Devices = u.Devices.Select(d => new Device
-                    {
-                        Id = d.Id,
-                        Manufacturer = d.Manufacturer,
-                        Name = d.Name,
-                        Type = d.Type,
-                        RAMAmount = d.RAMAmount,
-                        Processor = d.Processor,
-                        OSVersion = d.OSVersion,
-                        OperatingSystem = d.OperatingSystem,
-                        Description = d.Description
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync();
+            var user = await _userRepository.GetUserById(userId);
 
             if (user == null)
             {
