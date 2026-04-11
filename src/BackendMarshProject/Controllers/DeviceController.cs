@@ -1,6 +1,7 @@
-﻿using BackendMarshProject.DTOs.Form;
-using BackendMarshProject.Entities;
+﻿using BackendMarshProject.DTOs.Device;
+using BackendMarshProject.DTOs.Form;
 using BackendMarshProject.Entities.Paging;
+using BackendMarshProject.Enums;
 using BackendMarshProject.Exceptions;
 using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,7 +22,7 @@ namespace BackendMarshProject.Controllers
 
         [HttpGet("get-devices")]
         [Authorize]
-        public async Task<ActionResult<PagedResult<Device>>> GetDevices([FromQuery] PaginationParameters paginationParameters)
+        public async Task<ActionResult<PagedResult<DeviceDTO>>> GetDevices([FromQuery] PaginationParameters paginationParameters)
         {
             if (!ModelState.IsValid)
             { 
@@ -35,7 +36,7 @@ namespace BackendMarshProject.Controllers
 
         [HttpGet("get-device/{id}")]
         [Authorize]
-        public async Task<ActionResult<Device>> GetDevice(int id)
+        public async Task<ActionResult<DeviceDTO>> GetDevice(int id)
         {
             try
             {
@@ -54,8 +55,8 @@ namespace BackendMarshProject.Controllers
         }
 
         [HttpPatch("edit-device/{id}")]
-        [Authorize(Roles = "SuperAdmin, InventoryManager")]
-        public async Task<ActionResult<Device>> EditDevice(int id, [FromBody] EditDevice editDevice)
+        [Authorize(Roles = "Admin, InventoryManager")]
+        public async Task<ActionResult<DeviceDTO>> EditDevice(int id, [FromBody] EditDevice editDevice)
         {
             if (!ModelState.IsValid)
             {
@@ -87,8 +88,8 @@ namespace BackendMarshProject.Controllers
         }
 
         [HttpPost("add-device")]
-        [Authorize(Roles = "SuperAdmin, InventoryManager")]
-        public async Task<ActionResult<Device>> AddDevice([FromBody] NewDevice newDevice)
+        [Authorize(Roles = "Admin, InventoryManager")]
+        public async Task<ActionResult<DeviceDTO>> AddDevice([FromBody] NewDevice newDevice)
         {
             if (!ModelState.IsValid)
             {
@@ -112,7 +113,7 @@ namespace BackendMarshProject.Controllers
         }
 
         [HttpDelete("delete-device/{id}")]
-        [Authorize(Roles = "SuperAdmin, InventoryManager")]
+        [Authorize(Roles = "Admin, InventoryManager")]
         public async Task<IActionResult> DeleteDevice(int id)
         {
             try
@@ -128,7 +129,7 @@ namespace BackendMarshProject.Controllers
 
         [HttpGet("get-devices-overview")]
         [Authorize]
-        public async Task<ActionResult<PagedResult<Device>>> GetDevicesOverview([FromQuery] PaginationParameters paginationParameters)
+        public async Task<ActionResult<PagedResult<DeviceDTO>>> GetDevicesOverview([FromQuery] PaginationParameters paginationParameters)
         {
             if (!ModelState.IsValid)
             {

@@ -55,7 +55,7 @@ namespace BackendMarshProject.Repository
                     OSVersion = d.OSVersion,
                     RAMAmount = d.RAMAmount,
                     Description = d.Description,
-                    AssignedToUser = d.AssignedToUser == null ? null : new UserDTO
+                    AssignedToUser = d.AssignedToUser == null ? null : new DeviceUserDTO
                     {
                         Id = d.AssignedToUser.Id,
                         Name = d.AssignedToUser.Name,
@@ -82,7 +82,7 @@ namespace BackendMarshProject.Repository
                     OSVersion = d.OSVersion,
                     RAMAmount = d.RAMAmount,
                     Description = d.Description,
-                    AssignedToUser = d.AssignedToUser == null ? null : new UserDTO
+                    AssignedToUser = d.AssignedToUser == null ? null : new DeviceUserDTO
                     {
                         Id = d.AssignedToUser.Id,
                         Name = d.AssignedToUser.Name,
@@ -110,7 +110,7 @@ namespace BackendMarshProject.Repository
                     RAMAmount = d.RAMAmount,
                     Description = d.Description,
                     Type = d.Type,
-                    AssignedToUser = d.AssignedToUser == null ? null : new UserDTO
+                    AssignedToUser = d.AssignedToUser == null ? null : new DeviceUserDTO
                     {
                         Id = d.AssignedToUser.Id,
                         Name = d.AssignedToUser.Name,

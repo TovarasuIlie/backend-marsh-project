@@ -3,7 +3,7 @@ using BackendMarshProject.Enums;
 
 namespace BackendMarshProject.DTOs.Device
 {
-    public class UserDTO
+    public class DeviceUserDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

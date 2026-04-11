@@ -2,7 +2,7 @@
 
 namespace BackendMarshProject.DTOs.User
 {
-    public class DeviceDTO
+    public class UserDeviceDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

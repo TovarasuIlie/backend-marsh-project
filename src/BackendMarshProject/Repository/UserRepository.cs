@@ -7,10 +7,15 @@ namespace BackendMarshProject.Repository
 {
     public interface IUserRepository
     {
+        IQueryable<UserDTO> GetUsers();
         Task<UserDTO?> GetUserById(int id);
+        Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmail(string email);
         Task<bool> IsDuplicateEmail(string email);
         Task AddUserAsync(User user);
+        Task DeleteUserAsync(User user);
+
+        Task SaveChangesAsync();
     }
 
     public class UserRepository : IUserRepository
@@ -25,6 +30,12 @@ namespace BackendMarshProject.Repository
         {
             _context.Users.Add(user);
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteUserAsync(User user)
+        {
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
 
@@ -44,7 +55,7 @@ namespace BackendMarshProject.Repository
                     Role = u.Role,
                     Email = u.Email,
                     Location = u.Location,
-                    Devices = u.Devices.Select(d => new DeviceDTO
+                    Devices = u.Devices.Select(d => new UserDeviceDTO
                     {
                         Id = d.Id,
                         Name = d.Name,
@@ -60,6 +71,11 @@ namespace BackendMarshProject.Repository
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<User?> GetUserByIdAsync(int id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
         public IQueryable<UserDTO> GetUsers()
         {
             return _context.Users
@@ -71,7 +87,7 @@ namespace BackendMarshProject.Repository
                     Role = u.Role,
                     Email = u.Email,
                     Location = u.Location,
-                    Devices = u.Devices.Select(d => new DeviceDTO
+                    Devices = u.Devices.Select(d => new UserDeviceDTO
                     {
                         Id = d.Id,
                         Name = d.Name,
@@ -89,6 +105,11 @@ namespace BackendMarshProject.Repository
         public async Task<bool> IsDuplicateEmail(string email)
         {
             return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,11 +1,8 @@
 ﻿using BackendMarshProject.DTOs;
 using BackendMarshProject.DTOs.Form;
-using BackendMarshProject.DTOs.User;
 using BackendMarshProject.Exceptions;
 using BackendMarshProject.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace BackendMarshProject.Controllers
 {
@@ -51,28 +48,6 @@ namespace BackendMarshProject.Controllers
             catch (BadRequestException ex)
             {
                 return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred." });
-            }
-        }
-
-        [HttpGet("user-overview")]
-        [Authorize]
-        public async Task<ActionResult<UserDTO>> UserOverview()
-        {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            try
-            {
-                var user = await _authService.GetUserData(int.Parse(userIdString));
-
-                return Ok(user);
-            }
-            catch (NotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
             }
             catch (Exception)
             {

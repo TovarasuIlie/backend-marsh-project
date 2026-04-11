@@ -8,7 +8,7 @@ namespace BackendMarshProject.DTOs.Device
         public string Name { get; set; }
         public string Manufacturer { get; set; }
         public DeviceType Type { get; set; }
-        public UserDTO? AssignedToUser { get; set; }
+        public DeviceUserDTO? AssignedToUser { get; set; }
         public string OperatingSystem { get; set; }
         public string OSVersion { get; set; }
         public string Processor { get; set; }

@@ -19,8 +19,6 @@ namespace UnitTests.Services
         private AppDbContext _appDbContext;
         private IDbContextTransaction _transaction;
 
-        private int _deviceId;
-
         [TestInitialize]
         public void Setup()
         {

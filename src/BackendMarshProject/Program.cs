@@ -1,4 +1,5 @@
 using BackendMarshProject.Data;
+using BackendMarshProject.Repository;
 using BackendMarshProject.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnectionString"));
 });
 
+builder.Services.AddScoped<IDeviceReposity, DeviceRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 builder.Services.AddScoped<DeviceService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<LLMService>();
+builder.Services.AddScoped<UserService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
