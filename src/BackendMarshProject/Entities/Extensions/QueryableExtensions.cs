@@ -30,5 +30,31 @@ namespace BackendMarshProject.Entities.Extensions
                 Metadata = metadata
             };
         }
+
+        public static Task<PagedResult<T>> ToPagedResult<T>(this IEnumerable<T> source, PaginationParameters paginationParameters)
+        {
+            var totalCount = source.Count();
+            var items = source.Skip((paginationParameters.PageNumber - 1) * paginationParameters.PageSize)
+                                    .Take(paginationParameters.PageSize)
+                                    .ToList();
+
+            var totalPages = (int)Math.Ceiling(totalCount / (double)paginationParameters.PageSize);
+
+            var metadata = new PaginationMetadata
+            {
+                CurrentPage = paginationParameters.PageNumber,
+                PageSize = paginationParameters.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalPages,
+                HasNext = paginationParameters.PageNumber < totalPages,
+                HasPrevious = paginationParameters.PageNumber > 1,
+            };
+
+            return Task.FromResult(new PagedResult<T>
+            {
+                Data = items,
+                Metadata = metadata
+            });
+        }
     }
 }

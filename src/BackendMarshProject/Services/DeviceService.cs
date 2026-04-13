@@ -26,12 +26,72 @@ namespace BackendMarshProject.Services
             return await _deviceReposity.GetAllDevices().ToPagedResultAsync(paginationParameters);
         }
 
+        public async Task<PagedResult<DeviceDTO>> GetAllDevices(PaginationParameters paginationParameters, string query)
+        {
+            if(string.IsNullOrWhiteSpace(query))
+                return await _deviceReposity.GetAllDevices().ToPagedResultAsync(paginationParameters);
+
+            var normalizedQuery = query.ToLower().Trim();
+            var tokens = normalizedQuery.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return await _deviceReposity.GetAllDevices()
+                .AsEnumerable()
+                .Select(d =>
+                {
+                    int score = 0;
+
+                    foreach(var token in tokens)
+                    {
+                        if (d.Name.ToLower().Contains(token)) score += 10;
+                        if (d.Manufacturer.ToLower().Contains(token)) score += 5;
+                        if (d.Processor.ToLower().Contains(token)) score += 3;
+                        if (d.RAMAmount.Equals(token)) score += 1;
+                    }
+                    return new { Device = d, Score = score };
+                })
+                .Where(d => d.Score > 0)
+                .OrderByDescending(d => d.Score)
+                .Select(d => d.Device)
+                .ToPagedResult(paginationParameters);
+        }
+
         public async Task<PagedResult<DeviceDTO>> GetMyAndUnassignedDevices(PaginationParameters paginationParameters, int userId)
         {
             return await _deviceReposity.GetAllUnassignedDevices(userId)
                 .OrderByDescending(d => d.AssignedToUser.Id)
                 .ThenBy(d => d.Id)
                 .ToPagedResultAsync(paginationParameters);
+        }
+
+        public async Task<PagedResult<DeviceDTO>> GetMyAndUnassignedDevices(PaginationParameters paginationParameters, int userId, string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return await _deviceReposity.GetAllDevices().ToPagedResultAsync(paginationParameters);
+
+            var normalizedQuery = query.ToLower().Trim();
+            var tokens = normalizedQuery.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return await _deviceReposity.GetAllUnassignedDevices(userId)
+                .AsEnumerable()
+                .OrderByDescending(d => d.AssignedToUser?.Id ?? 0)
+                .ThenBy(d => d.Id)
+                .Select(d =>
+                {
+                    int score = 0;
+
+                    foreach (var token in tokens)
+                    {
+                        if (d.Name.ToLower().Contains(token)) score += 10;
+                        if (d.Manufacturer.ToLower().Contains(token)) score += 5;
+                        if (d.Processor.ToLower().Contains(token)) score += 3;
+                        if (d.RAMAmount.Equals(token)) score += 1;
+                    }
+                    return new { Device = d, Score = score };
+                })
+                .Where(d => d.Score > 0)
+                .OrderByDescending(d => d.Score)
+                .Select(d => d.Device)
+                .ToPagedResult(paginationParameters);
         }
 
         public async Task<DeviceDTO?> GetDeviceById(int id)

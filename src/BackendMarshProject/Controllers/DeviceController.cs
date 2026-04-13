@@ -34,6 +34,20 @@ namespace BackendMarshProject.Controllers
             return Ok(devices);
         }
 
+        [HttpGet("get-devices-filtred")]
+        [Authorize]
+        public async Task<ActionResult<PagedResult<DeviceDTO>>> GetDevicesFiltred([FromQuery] PaginationParameters paginationParameters, [FromQuery] string filterQuery)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
+            }
+
+            var devices = await _deviceService.GetAllDevices(paginationParameters, filterQuery);
+
+            return Ok(devices);
+        }
+
         [HttpGet("get-device/{id}")]
         [Authorize]
         public async Task<ActionResult<DeviceDTO>> GetDevice(int id)
@@ -145,6 +159,33 @@ namespace BackendMarshProject.Controllers
             try
             {
                 var devices = await _deviceService.GetMyAndUnassignedDevices(paginationParameters, userId);
+
+                return Ok(devices);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
+            }
+        }
+
+        [HttpGet("get-devices-overview-filtred")]
+        [Authorize]
+        public async Task<ActionResult<PagedResult<DeviceDTO>>> GetDevicesOverviewFiltred([FromQuery] PaginationParameters paginationParameters, [FromQuery] string filterQuery)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
+            }
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized(new { message = "Invalid user token." });
+            }
+
+            try
+            {
+                var devices = await _deviceService.GetMyAndUnassignedDevices(paginationParameters, userId, filterQuery);
 
                 return Ok(devices);
             }
