@@ -6,6 +6,7 @@ using BackendMarshProject.Entities.Paging;
 using BackendMarshProject.Exceptions;
 using BackendMarshProject.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BackendMarshProject.Services
 {
@@ -35,7 +36,7 @@ namespace BackendMarshProject.Services
             return user;
         }
 
-        public async Task DeleteUser(int id)
+        public async Task DeleteUser(int id, int adminId)
         {
             User? user = await _userRepository.GetUserByIdAsync(id);
 
@@ -44,16 +45,26 @@ namespace BackendMarshProject.Services
                 throw new NotFoundException("The user no longer exists in the system.");
             }
 
+            if (user.Id == adminId)
+            {
+                throw new BadRequestException("You can't delete account by yourself.");
+            }
+
             await _userRepository.DeleteUserAsync(user);
         }
 
-        public async Task<User> UpdateUser(int id, EditUser editUser)
+        public async Task<User> UpdateUser(int id, EditUser editUser, int adminId)
         {
             User? user = await _userRepository.GetUserByIdAsync(id);
 
             if (user == null)
             {
                 throw new NotFoundException("The user no longer exists in the system.");
+            }
+
+            if (user.Id == adminId && user.Role != editUser.Role)
+            {
+                throw new BadRequestException("You can't edit your role by yourself.");
             }
 
             user.Name = editUser.Name;

@@ -64,15 +64,25 @@ namespace BackendMarshProject.Controllers
                 return BadRequest(new { message = ModelState.Values.SelectMany(v => v.Errors.Select(b => b.ErrorMessage)).ToList() });
             }
 
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(adminIdString, out int adminId))
+            {
+                return StatusCode(403, new { message = "Invalid user token." });
+            }
+
             try
             {
-                var result = await _userService.UpdateUser(id, editUser);
+                var result = await _userService.UpdateUser(id, editUser, adminId);
 
                 return Ok(result);
             }
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception)
             {
@@ -84,14 +94,24 @@ namespace BackendMarshProject.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(adminIdString, out int adminId))
+            {
+                return StatusCode(403, new { message = "Invalid user token." });
+            }
+
             try
             {
-                await _userService.DeleteUser(id);
+                await _userService.DeleteUser(id, adminId);
                 return NoContent();
             }
             catch (NotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception)
             {
