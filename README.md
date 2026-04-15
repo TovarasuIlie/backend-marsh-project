@@ -29,8 +29,9 @@ creating duplicate records.
 ### Using Visual Studio:
 Open the ```.sln``` file, set the Web API project as the **Startup** Project, and press **F5**.
 
-### Using Visual Studio:
+### Using Visual Studio Code:
 ```bash
+cd src
 dotnet restore
 dotnet run --project BackendMarshProject
 ```
@@ -38,7 +39,7 @@ dotnet run --project BackendMarshProject
 ## Step 4: Accessing API Documentation
 The project is equipped with Swagger for easy testing. Once running, navigate to:
 ```
-https://localhost:XXXX/swagger/index.html
+https://localhost:5128/swagger/index.html
 ```
 
 ### Note
