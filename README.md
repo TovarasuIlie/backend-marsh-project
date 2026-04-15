@@ -39,7 +39,7 @@ dotnet run --project BackendMarshProject
 ## Step 4: Accessing API Documentation
 The project is equipped with Swagger for easy testing. Once running, navigate to:
 ```
-https://localhost:5128/swagger/index.html
+http://localhost:5128/swagger/index.html
 ```
 
 ### Note
